@@ -7,11 +7,11 @@ const PORT = 3000;
 // Middleware zum Parsen von JSON-Daten
 app.use(express.json());
 
-// MySQL-Datenbankverbindung einrichten
+// MySQL-Datenbankverbindung 
 const db = mysql.createConnection({
     host: 'localhost',
-    user: 'root',       // Dein MySQL-Benutzername
-    password: 'emily', // Dein MySQL-Passwort
+    user: 'root',      
+    password: 'emily', 
     database: 'alcoy_db'
 });
 
@@ -23,7 +23,7 @@ db.connect((err) => {
     console.log('Erfolgreich mit der Datenbank verbunden.');
 });
 
-// Beispiel-Endpunkt zum Abrufen aller Spieler
+// Abrufen aller Spieler
 app.get('/api/players', (req, res) => {
     const sql = 'SELECT * FROM players';
     db.query(sql, (err, results) => {
@@ -32,7 +32,7 @@ app.get('/api/players', (req, res) => {
     });
 });
 
-// Beispiel-Endpunkt zum Hinzufügen eines Spielers
+// Hinzufügen eines Spielers
 app.post('/api/players', (req, res) => {
     const { name, score } = req.body;
     const sql = 'INSERT INTO players (name, score) VALUES (?, ?)';

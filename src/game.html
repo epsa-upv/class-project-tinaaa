@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Play Game</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Rock-Paper-Scissors</h1>
+        <p>Choose your move:</p>
+        <button onclick="playMove('rock')">Rock</button>
+        <button onclick="playMove('paper')">Paper</button>
+        <button onclick="playMove('scissors')">Scissors</button>
+        <p id="gameResult"></p>
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+const gameId = urlParams.get('gameId');
+
+function playMove(playerMove) {
+    fetch(`/api/games/${gameId}/play`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ playerMove })
+    })
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById('gameResult').innerText = 
+            `Dein Zug: ${playerMove}, Computerzug: ${data.computerMove}, Ergebnis: ${data.result}`;
+    })
+    .catch(error => console.error('Fehler beim Spielen:', error));
+}
+
+    </script>
+</body>
+</html>

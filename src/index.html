@@ -3,26 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to Rock-Paper-Scissors</title>
     <link rel="stylesheet" href="style.css">
-    <title>Rock Paper Scissors</title>
 </head>
 <body>
     <div class="container">
-        <h1>Scissors, Stone, Paper</h1>
-        <p>Choose your Option:</p>
-        <div class="buttons">
-            <button id="rock">Stone</button>
-            <button id="paper">Paper</button>
-            <button id="scissors">Scissor</button>
-        </div>
-        <div id="result" class="result"></div>
-        <div id="score" class="score">Player: 0, Computer: 0</div>
+        <h1>Welcome to Rock-Paper-Scissors</h1>
+        <p>Enter your name to start playing:</p>
+        <input type="text" id="playerName" placeholder="Your name">
+        <button onclick="enterGame()">Enter</button>
     </div>
-    <h1>Spielerliste</h1>
-    <div id="player-list"></div>
-    <script src="client.js"></script>
+    <script>
+        function enterGame() {
+            const name = document.getElementById('playerName').value;
+            if (!name.trim()) {
+                alert("Please enter a name.");
+                return;
+            }
+
+            // Save player name to local storage
+            localStorage.setItem("playerName", name);
+
+            // Redirect to lobby
+            window.location.href = "lobby.html";
+        }
+    </script>
 </body>
 </html>
-
-
-

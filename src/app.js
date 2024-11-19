@@ -10,7 +10,7 @@ app.use(express.json());
 const db = mysql.createConnection({
     host: 'localhost',
     user: 'root',
-    password: 'Hochbett-2000',
+    password: 'emily',
     database: 'alcoy_db'
 });
 
@@ -53,17 +53,18 @@ app.get('/api/games/open', (req, res) => {
 
 // Neues Spiel erstellen
 app.post('/api/games', (req, res) => {
-    const { playerId } = req.body;
-    const sql = 'INSERT INTO games (playerId, status) VALUES (?, "open")';
+    const { playerId } = req.body; // playerId wird als player1_id gesetzt
+    const sql = 'INSERT INTO games (player1_id, player2_id, status) VALUES (?, NULL, "open")';
     db.query(sql, [playerId], (err, result) => {
         if (err) {
             console.error("Fehler beim Erstellen eines neuen Spiels:", err);
             res.status(500).send("Fehler beim Erstellen eines neuen Spiels.");
             return;
         }
-        res.status(201).json({ gameId: result.insertId, status: "open" });
+        res.status(201).json({ gameId: result.insertId, player1_id: playerId, player2_id: null, status: "open" });
     });
 });
+
 
 // Spiel starten und Spielzug auswählen
 app.post('/api/games/:gameId/play', (req, res) => {

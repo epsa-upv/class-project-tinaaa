@@ -1,11 +1,10 @@
-// script.js
 let playerId = null;
 
-// Spieler erstellen
+// Create Player
 function createPlayer() {
     const name = document.getElementById('playerName').value;
     if (!name) {
-        alert("Bitte einen Namen eingeben!");
+        alert("Please enter a name!");
         return;
     }
 
@@ -17,12 +16,12 @@ function createPlayer() {
     .then(response => response.json())
     .then(data => {
         playerId = data.id;
-        document.getElementById('playerMessage').innerText = `Spieler '${name}' wurde erstellt! (ID: ${playerId})`;
+        document.getElementById('playerMessage').innerText = `Player '${name}' is created! (ID: ${playerId})`;
     })
-    .catch(error => console.error('Fehler beim Erstellen des Spielers:', error));
+    .catch(error => console.error('Error while creating Player:', error));
 }
 
-// Offene Spiele laden
+// load open games
 function loadOpenGames() {
     fetch('/api/games/open')
         .then(response => response.json())
@@ -35,13 +34,13 @@ function loadOpenGames() {
                 openGamesList.appendChild(li);
             });
         })
-        .catch(error => console.error('Fehler beim Laden der offenen Spiele:', error));
+        .catch(error => console.error('Error while loading open games:', error));
 }
 
-// Neues Spiel erstellen
+// create new game
 function createGame() {
     if (!playerId) {
-        alert("Bitte zuerst einen Spieler erstellen!");
+        alert("Please create a player first!");
         return;
     }
 
@@ -52,15 +51,15 @@ function createGame() {
     })
     .then(response => response.json())
     .then(data => {
-        document.getElementById('gameMessage').innerText = `Neues Spiel erstellt! (ID: ${data.gameId})`;
+        document.getElementById('gameMessage').innerText = `New game created! (ID: ${data.gameId})`;
     })
-    .catch(error => console.error('Fehler beim Erstellen des Spiels:', error));
+    .catch(error => console.error('Error while creating the game:', error));
 }
 
-// Spiel spielen
+// Play game
 function playGame(playerMove) {
     if (!playerId) {
-        alert("Bitte zuerst ein Spiel erstellen!");
+        alert("Please create a game first!");
         return;
     }
 
@@ -68,11 +67,11 @@ function playGame(playerMove) {
         .then(response => response.json())
         .then(openGames => {
             if (openGames.length === 0) {
-                alert("Es gibt keine offenen Spiele. Bitte ein neues Spiel erstellen.");
+                alert("There are no open games. Please create a new game.");
                 return;
             }
 
-            const gameId = openGames[0].id; // Erstes offenes Spiel verwenden
+            const gameId = openGames[0].id; // use the first open game
 
             fetch(`/api/games/${gameId}/play`, {
                 method: 'POST',
@@ -83,12 +82,12 @@ function playGame(playerMove) {
             .then(data => {
                 document.getElementById('gameResult').innerText = `Dein Zug: ${playerMove}, Computerzug: ${data.computerMove}, Ergebnis: ${data.result}`;
             })
-            .catch(error => console.error('Fehler beim Spielen:', error));
+            .catch(error => console.error('Error while playing:', error));
         })
-        .catch(error => console.error('Fehler beim Laden der offenen Spiele:', error));
+        .catch(error => console.error('Error while loading the open games:', error));
 }
 
-// Abgeschlossene Spiele laden
+// load closed games
 function loadClosedGames() {
     fetch('/api/games/closed')
         .then(response => response.json())
@@ -101,5 +100,5 @@ function loadClosedGames() {
                 closedGamesList.appendChild(li);
             });
         })
-        .catch(error => console.error('Fehler beim Laden der abgeschlossenen Spiele:', error));
+        .catch(error => console.error('Error while loading closed games:', error));
 }

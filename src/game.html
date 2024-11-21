@@ -29,9 +29,9 @@ function playMove(playerMove) {
     .then(response => response.json())
     .then(data => {
         document.getElementById('gameResult').innerText = 
-            `Dein Zug: ${playerMove}, Computerzug: ${data.computerMove}, Ergebnis: ${data.result}`;
+            `Your Move: ${playerMove}, Bot Move: ${data.computerMove}, Result: ${data.result}`;
     })
-    .catch(error => console.error('Fehler beim Spielen:', error));
+    .catch(error => console.error('Error while playing:', error));
 }
 
     </script>

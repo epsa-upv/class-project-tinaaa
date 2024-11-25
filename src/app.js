@@ -88,29 +88,29 @@ app.post('/api/login', (req, res) => {
 app.post('/api/register', (req, res) => {
     const { username, password, role = 'player' } = req.body;
 
-    // Check if the username already exists
+    // Check if username already exists
     db.query('SELECT * FROM users WHERE username = ?', [username], (err, results) => {
         if (err) {
-            console.error('Error when checking if user exists:', err);
-            return res.status(500).send({ error: 'Database error while checking for existing username' });
+            console.error('Error during user registration:', err);
+            return res.status(500).json({ error: 'Database error' });
         }
 
         if (results.length > 0) {
-            return res.status(400).send({ error: 'Username already exists' });
+            console.log('Username already exists');
+            return res.status(400).json({ error: 'Username already exists' }); // JSON Response on Error
         }
 
-        // Hash the password
+        // Hash the password and save the user
         bcrypt.hash(password, 10, (err, hashedPassword) => {
             if (err) {
                 console.error('Error during password hashing:', err);
-                return res.status(500).send({ error: 'Error during password hashing' });
+                return res.status(500).json({ error: 'Error during password hashing' });
             }
 
-            // Save user to the database
             db.query('INSERT INTO users (username, password, role) VALUES (?, ?, ?)', [username, hashedPassword, role], (err, result) => {
                 if (err) {
-                    console.error('Error saving the user:', err);
-                    return res.status(500).send({ error: 'Error saving the user to the database' });
+                    console.error('Error saving user:', err);
+                    return res.status(500).json({ error: 'Error saving user' });
                 }
 
                 res.status(201).json({ message: 'User registered successfully' });
@@ -118,6 +118,7 @@ app.post('/api/register', (req, res) => {
         });
     });
 });
+
 
 
 

@@ -1,10 +1,11 @@
 const express = require('express');
 const mysql = require('mysql2');
-const cors = require('cors'); 
+const cors = require('cors');
+const bcrypt = require('bcryptjs'); // For hashing passwords
 const app = express();
 const PORT = 3000;
 
-app.use(cors()); 
+app.use(cors());
 app.use(express.json());
 
 const db = mysql.createConnection({
@@ -22,22 +23,6 @@ db.connect((err) => {
     console.log('Data connection successful.');
 });
 
-// create Player
-app.post('/api/players', (req, res) => {
-    const { playerName } = req.body;
-    if (!playerName) {
-        return res.status(400).send('Playername required.');
-    }
-
-    const insertPlayerSql = 'INSERT INTO players (name) VALUES (?)';
-    db.query(insertPlayerSql, [playerName], (err, result) => {
-        if (err) {
-            console.error('Error when creating the player:', err);
-            return res.status(500).send('Error when creating the player');
-        }
-        res.status(201).json({ id: result.insertId, name: playerName });
-    });
-});
 
 // Show open games
 app.get('/api/games/open', (req, res) => {
@@ -51,9 +36,9 @@ app.get('/api/games/open', (req, res) => {
     });
 });
 
-// NCreating new game
+// Creating new game
 app.post('/api/games', (req, res) => {
-    const { playerId } = req.body; // playerId wird als player1_id gesetzt
+    const { playerId } = req.body; // playerId is set as player1_id
     const sql = 'INSERT INTO games (player1_id, player2_id, status) VALUES (?, NULL, "open")';
     db.query(sql, [playerId], (err, result) => {
         if (err) {
@@ -65,75 +50,78 @@ app.post('/api/games', (req, res) => {
     });
 });
 
+// Login route (distinguishing between Admin and Player)
+app.post('/api/login', (req, res) => {
+    const { username, password } = req.body;
 
-// Start game & choose move
-app.post('/api/games/:gameId/play', (req, res) => {
-    const { gameId } = req.params;
-    const { playerMove } = req.body;
-
-    const getGameSql = 'SELECT * FROM games WHERE id = ? AND status = "open"';
-    db.query(getGameSql, [gameId], (err, results) => {
-        if (err || results.length === 0) {
-            console.error("Error showing the game or game not available:", err);
-            res.status(404).send("Error showing the game or game not available.");
-            return;
+    // Search for the user in the database
+    db.query('SELECT * FROM users WHERE username = ?', [username], (err, results) => {
+        if (err) {
+            console.error('Error when finding user:', err);
+            return res.status(500).send('Database error');
         }
 
-        const moves = ['rock', 'paper', 'scissors'];
-        const computerMove = moves[Math.floor(Math.random() * moves.length)];
-
-        let result;
-        if (playerMove === computerMove) {
-            result = 'draw';
-        } else if (
-            (playerMove === 'rock' && computerMove === 'scissors') ||
-            (playerMove === 'scissors' && computerMove === 'paper') ||
-            (playerMove === 'paper' && computerMove === 'rock')
-        ) {
-            result = 'win';
-        } else {
-            result = 'lose';
+        if (results.length === 0) {
+            return res.status(404).send('User not found');
         }
 
-        const updateGameSql = 'UPDATE games SET status = "closed", result = ? WHERE id = ?';
-        db.query(updateGameSql, [result, gameId], (updateErr) => {
-            if (updateErr) {
-                console.error("Error when updating the game:", updateErr);
-                res.status(500).send("Error when updating the game.");
-                return;
+        const user = results[0];
+
+        // Verify password
+        bcrypt.compare(password, user.password, (err, isMatch) => {
+            if (err) {
+                console.error('Error during password comparison:', err);
+                return res.status(500).send('Error during password comparison');
             }
 
-            if (result === 'win') {
-                const updateScoreSql = 'UPDATE players SET score = score + 1 WHERE id = ?';
-                db.query(updateScoreSql, [results[0].playerId], (scoreErr) => {
-                    if (scoreErr) {
-                        console.error("Error when updating the player status:", scoreErr);
-                        res.status(500).send("Error when updating the player status.");
-                        return;
-                    }
-                    res.json({ playerMove, computerMove, result });
-                });
-            } else {
-                res.json({ playerMove, computerMove, result });
+            if (!isMatch) {
+                return res.status(401).send('Invalid password');
             }
+
+            // Return user role (Admin or Player)
+            res.status(200).json({ message: 'Login successful', role: user.role });
         });
     });
 });
 
-// Show completed games
-app.get('/api/games/closed', (req, res) => {
-    const sql = 'SELECT * FROM games WHERE status = "closed"';
-    db.query(sql, (err, results) => {
+// Register route (creating new user)
+app.post('/api/register', (req, res) => {
+    const { username, password, role = 'player' } = req.body;
+
+    // Check if the username already exists
+    db.query('SELECT * FROM users WHERE username = ?', [username], (err, results) => {
         if (err) {
-            console.error("Error when showing completed games:", err);
-            res.status(500).send("Error when showing completed games.");
-            return;
+            console.error('Error when checking if user exists:', err);
+            return res.status(500).send({ error: 'Database error while checking for existing username' });
         }
-        res.json(results);
+
+        if (results.length > 0) {
+            return res.status(400).send({ error: 'Username already exists' });
+        }
+
+        // Hash the password
+        bcrypt.hash(password, 10, (err, hashedPassword) => {
+            if (err) {
+                console.error('Error during password hashing:', err);
+                return res.status(500).send({ error: 'Error during password hashing' });
+            }
+
+            // Save user to the database
+            db.query('INSERT INTO users (username, password, role) VALUES (?, ?, ?)', [username, hashedPassword, role], (err, result) => {
+                if (err) {
+                    console.error('Error saving the user:', err);
+                    return res.status(500).send({ error: 'Error saving the user to the database' });
+                }
+
+                res.status(201).json({ message: 'User registered successfully' });
+            });
+        });
     });
 });
 
-// Server starten
+
+
+// Start the server
 app.listen(PORT, () => {
-    console.log(`Server runs on http://localhost:${PORT}`);
+    console.log(`Server running on http://localhost:${PORT}`);
 });

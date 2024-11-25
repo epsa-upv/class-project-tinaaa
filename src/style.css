@@ -1,3 +1,12 @@
+/* Global styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+/* Body styles */
 body {
     font-family: Arial, sans-serif;
     background-color: #f0f0f0;
@@ -9,6 +18,7 @@ body {
     margin: 0;
 }
 
+/* Container for the login section */
 .container {
     background-color: #fff;
     padding: 20px;
@@ -19,46 +29,73 @@ body {
     text-align: center;
 }
 
+/* Welcome message */
 h1 {
     color: #0078D7;
     margin-bottom: 20px;
 }
 
+.description {
+    font-size: 16px;
+    color: #777;
+    margin-bottom: 20px;
+}
+
+/* Button styling */
 button {
     background-color: #0078D7;
     color: white;
-    padding: 10px 20px;
+    padding: 12px 20px;
     border: none;
-    border-radius: 4px;
+    border-radius: 5px;
     cursor: pointer;
-    margin: 10px;
+    width: 80%;
+    font-size: 16px;
+    margin: 10px 0;
 }
 
 button:hover {
     background-color: #005bb5;
 }
 
-input[type="text"] {
-    padding: 10px;
+/* Input fields styling */
+input[type="text"], input[type="password"] {
+    padding: 12px;
     width: 80%;
     margin: 10px 0;
-    border-radius: 4px;
+    border-radius: 5px;
     border: 1px solid #ddd;
+    font-size: 14px;
 }
 
-ul {
-    list-style-type: none;
-    padding: 0;
+input[type="text"]:focus, input[type="password"]:focus {
+    border-color: #0078D7;
+    outline: none;
 }
 
-li {
-    padding: 8px;
-    background-color: #f9f9f9;
-    border: 1px solid #ddd;
-    margin: 5px 0;
-    border-radius: 4px;
+/* Form section */
+.login-box {
+    background-color: #f8f8f8;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
+/* Additional sections */
+.signup-link {
+    margin-top: 10px;
+}
+
+.signup-link a {
+    color: #0078D7;
+    text-decoration: none;
+}
+
+.signup-link a:hover {
+    text-decoration: underline;
+}
+
+/* Game actions, AI section, and other pages */
 .game-actions, .ai-section {
     margin-bottom: 30px;
 }
@@ -79,6 +116,7 @@ h3 {
     color: #0078D7;
 }
 
+/* Table styling */
 table {
     width: 100%;
     margin-top: 20px;
@@ -99,6 +137,7 @@ th {
     color: white;
 }
 
+/* Additional error messages */
 #lobbyMessage {
     margin-top: 20px;
     color: #e60000;

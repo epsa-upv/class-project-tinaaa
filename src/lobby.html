@@ -57,8 +57,16 @@
     </div>
 
     <script>
+        // Retrieve player name from localStorage
         const playerName = localStorage.getItem("playerName");
 
+        if (playerName) {
+            document.getElementById('playerNameDisplay').innerText = playerName;
+        } else {
+            alert("Player name is missing.");
+            window.location.href = "index.html"; // Redirect to login page if no player name exists
+        }
+        
         if (playerName) {
             document.getElementById('playerNameDisplay').innerText = playerName;
         } else {

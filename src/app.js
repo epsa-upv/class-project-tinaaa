@@ -1,10 +1,10 @@
 const express = require('express');
 const mysql = require('mysql2');
-const cors = require('cors'); // Importiere CORS
+const cors = require('cors'); 
 const app = express();
 const PORT = 3000;
 
-app.use(cors()); // Aktiviert CORS für alle Ursprünge
+app.use(cors()); 
 app.use(express.json());
 
 const db = mysql.createConnection({
@@ -16,56 +16,57 @@ const db = mysql.createConnection({
 
 db.connect((err) => {
     if (err) {
-        console.error('Datenbankverbindung fehlgeschlagen:', err.stack);
+        console.error('Data connection fail:', err.stack);
         return;
     }
-    console.log('Erfolgreich mit der Datenbank verbunden.');
+    console.log('Data connection successful.');
 });
 
-// Spieler erstellen
+// create Player
 app.post('/api/players', (req, res) => {
     const { playerName } = req.body;
     if (!playerName) {
-        return res.status(400).send('Spielername erforderlich');
+        return res.status(400).send('Playername required.');
     }
 
     const insertPlayerSql = 'INSERT INTO players (name) VALUES (?)';
     db.query(insertPlayerSql, [playerName], (err, result) => {
         if (err) {
-            console.error('Fehler beim Erstellen des Spielers:', err);
-            return res.status(500).send('Fehler beim Erstellen des Spielers');
+            console.error('Error when creating the player:', err);
+            return res.status(500).send('Error when creating the player');
         }
         res.status(201).json({ id: result.insertId, name: playerName });
     });
 });
 
-// Abrufen der offenen Spiele
+// Show open games
 app.get('/api/games/open', (req, res) => {
     const getOpenGamesSql = 'SELECT * FROM games WHERE status = "open"';
     db.query(getOpenGamesSql, (err, results) => {
         if (err) {
-            console.error('Fehler beim Abrufen der offenen Spiele:', err);
-            return res.status(500).json({ error: 'Fehler beim Abrufen der offenen Spiele' });
+            console.error('Error when showing open games:', err);
+            return res.status(500).json({ error: 'Error when showing open games' });
         }
         res.json(results);
     });
 });
 
-// Neues Spiel erstellen
+// NCreating new game
 app.post('/api/games', (req, res) => {
-    const { playerId } = req.body;
-    const sql = 'INSERT INTO games (playerId, status) VALUES (?, "open")';
+    const { playerId } = req.body; // playerId wird als player1_id gesetzt
+    const sql = 'INSERT INTO games (player1_id, player2_id, status) VALUES (?, NULL, "open")';
     db.query(sql, [playerId], (err, result) => {
         if (err) {
-            console.error("Fehler beim Erstellen eines neuen Spiels:", err);
-            res.status(500).send("Fehler beim Erstellen eines neuen Spiels.");
+            console.error("Error when creating a new game:", err);
+            res.status(500).send("Error when creating a new game.");
             return;
         }
-        res.status(201).json({ gameId: result.insertId, status: "open" });
+        res.status(201).json({ gameId: result.insertId, player1_id: playerId, player2_id: null, status: "open" });
     });
 });
 
-// Spiel starten und Spielzug auswählen
+
+// Start game & choose move
 app.post('/api/games/:gameId/play', (req, res) => {
     const { gameId } = req.params;
     const { playerMove } = req.body;
@@ -73,8 +74,8 @@ app.post('/api/games/:gameId/play', (req, res) => {
     const getGameSql = 'SELECT * FROM games WHERE id = ? AND status = "open"';
     db.query(getGameSql, [gameId], (err, results) => {
         if (err || results.length === 0) {
-            console.error("Fehler beim Abrufen des Spiels oder Spiel nicht verfügbar:", err);
-            res.status(404).send("Spiel nicht verfügbar oder bereits abgeschlossen.");
+            console.error("Error showing the game or game not available:", err);
+            res.status(404).send("Error showing the game or game not available.");
             return;
         }
 
@@ -97,8 +98,8 @@ app.post('/api/games/:gameId/play', (req, res) => {
         const updateGameSql = 'UPDATE games SET status = "closed", result = ? WHERE id = ?';
         db.query(updateGameSql, [result, gameId], (updateErr) => {
             if (updateErr) {
-                console.error("Fehler beim Aktualisieren des Spiels:", updateErr);
-                res.status(500).send("Fehler beim Speichern des Spielergebnisses.");
+                console.error("Error when updating the game:", updateErr);
+                res.status(500).send("Error when updating the game.");
                 return;
             }
 
@@ -106,8 +107,8 @@ app.post('/api/games/:gameId/play', (req, res) => {
                 const updateScoreSql = 'UPDATE players SET score = score + 1 WHERE id = ?';
                 db.query(updateScoreSql, [results[0].playerId], (scoreErr) => {
                     if (scoreErr) {
-                        console.error("Fehler beim Aktualisieren des Spielerstands:", scoreErr);
-                        res.status(500).send("Fehler beim Aktualisieren des Spielerstands.");
+                        console.error("Error when updating the player status:", scoreErr);
+                        res.status(500).send("Error when updating the player status.");
                         return;
                     }
                     res.json({ playerMove, computerMove, result });
@@ -119,13 +120,13 @@ app.post('/api/games/:gameId/play', (req, res) => {
     });
 });
 
-// Alle abgeschlossenen Spiele anzeigen
+// Show completed games
 app.get('/api/games/closed', (req, res) => {
     const sql = 'SELECT * FROM games WHERE status = "closed"';
     db.query(sql, (err, results) => {
         if (err) {
-            console.error("Fehler beim Abrufen abgeschlossener Spiele:", err);
-            res.status(500).send("Fehler beim Abrufen abgeschlossener Spiele.");
+            console.error("Error when showing completed games:", err);
+            res.status(500).send("Error when showing completed games.");
             return;
         }
         res.json(results);
@@ -134,5 +135,5 @@ app.get('/api/games/closed', (req, res) => {
 
 // Server starten
 app.listen(PORT, () => {
-    console.log(`Server läuft auf http://localhost:${PORT}`);
+    console.log(`Server runs on http://localhost:${PORT}`);
 });

@@ -121,6 +121,134 @@ app.post('/api/register', (req, res) => {
 
 
 
+//Tournaments
+
+
+// create tournament
+app.post('/api/tournaments', async (req, res) => {
+    try {
+        const { name, startDate, endDate } = req.body;
+        const tournament = await Tournament.create({
+            name,
+            startDate,
+            endDate,
+            status: 'active' // Standardmäßig auf 'active' setzen
+        });
+        res.status(201).json(tournament);
+    } catch (error) {
+        console.error('Error creating tournament:', error);
+        res.status(500).json({ message: 'Error creating tournament' });
+    }
+});
+
+
+// show tournaments
+app.get('/api/tournaments', async (req, res) => {
+    try {
+        const tournaments = await Tournament.findAll();
+        res.status(200).json(tournaments);
+    } catch (error) {
+        console.error('Error fetching tournaments:', error);
+        res.status(500).json({ message: 'Error fetching tournaments' });
+    }
+});
+
+
+
+//Rounds
+
+// create Rounds for Tournament
+app.post('/api/tournaments/:tournamentID/rounds', async (req, res) => {
+    try {
+        const { tournamentID } = req.params;
+        const { round_number, start_date, end_date } = req.body;
+
+        const round = await Round.create({
+            tournamentID,
+            round_number,
+            start_date,
+            end_date,
+            status: 'active' // Standardmäßig auf 'active' setzen
+        });
+
+        res.status(201).json(round);
+    } catch (error) {
+        console.error('Error creating round for tournament:', error);
+        res.status(500).json({ message: 'Error creating round' });
+    }
+});
+
+
+
+// Show all rounds from a tournament
+app.get('/api/tournaments/:tournamentID/rounds', async (req, res) => {
+    try {
+        const { tournamentID } = req.params;
+        const rounds = await Round.findAll({
+            where: { tournamentID },
+            order: [['round_number', 'ASC']] // Sortiere nach der Runde
+        });
+        res.status(200).json(rounds);
+    } catch (error) {
+        console.error('Error fetching rounds for tournament:', error);
+        res.status(500).json({ message: 'Error fetching rounds' });
+    }
+});
+
+
+
+// Play round
+app.post('/api/tournaments/:tournamentID/rounds/:roundID/play', async (req, res) => {
+    try {
+        const { tournamentID, roundID } = req.params;
+        const { playerMove } = req.body;
+        
+        const round = await Round.findByPk(roundID);
+        if (!round) {
+            return res.status(404).json({ message: 'Round not found' });
+        }
+        
+        const aiMove = getAIChoice();
+        const result = determineWinner(playerMove, aiMove);
+
+        // Update Runde mit Ergebnis
+        await round.update({ status: 'completed', result, aiMove });
+
+        res.status(200).json({ playerMove, aiMove, result });
+    } catch (error) {
+        console.error('Error playing round:', error);
+        res.status(500).json({ message: 'Error playing round' });
+    }
+});
+
+// Hilfsfunktionen für das Spiel
+function getAIChoice() {
+    const choices = ['rock', 'paper', 'scissors'];
+    const randomIndex = Math.floor(Math.random() * choices.length);
+    return choices[randomIndex];
+}
+
+function determineWinner(playerMove, aiMove) {
+    if (playerMove === aiMove) {
+        return 'Draw';
+    }
+    if (
+        (playerMove === 'rock' && aiMove === 'scissors') ||
+        (playerMove === 'scissors' && aiMove === 'paper') ||
+        (playerMove === 'paper' && aiMove === 'rock')
+    ) {
+        return 'You win';
+    }
+    return 'AI wins';
+}
+
+
+
+
+
+
+
+
 // Start the server
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);

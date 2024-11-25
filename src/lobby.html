@@ -7,6 +7,13 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+<header>
+    <div class="user-info">
+        <span id="user-name"></span>
+        <button id="logout-button">Logout</button>
+    </div>
+</header>
+<body>
     <div class="container">
         <h1>Welcome, <span id="playerNameDisplay"></span>!</h1>
         <p>Select an option:</p>
@@ -57,24 +64,28 @@
     </div>
 
     <script>
-        // Retrieve player name from localStorage
-        const playerName = localStorage.getItem("playerName");
+    const playerName = localStorage.getItem("playerName");
+
+    window.onload = function() {
+        const userName = localStorage.getItem('username'); 
+
+        if (userName) {
+            document.getElementById('user-name').textContent = `Logged in as: ${userName}`;
+            document.getElementById('logout-button').style.display = 'inline-block';
+
+            document.getElementById('logout-button').addEventListener('click', function() {
+                localStorage.removeItem('username');
+                window.location.href = 'index.html'; 
+            });
+        } 
 
         if (playerName) {
             document.getElementById('playerNameDisplay').innerText = playerName;
         } else {
             alert("Player name is missing.");
-            window.location.href = "index.html"; // Redirect to login page if no player name exists
-        }
-        
-        if (playerName) {
-            document.getElementById('playerNameDisplay').innerText = playerName;
-        } else {
-            alert("Player name is missing.");
-            window.location.href = "index.html"; // Redirect to index page if no player name exists
+            window.location.href = "index.html"; 
         }
 
-        // Start a new game
         document.getElementById('startNewGameBtn').addEventListener('click', startNewGame);
 
         function startNewGame() {
@@ -83,7 +94,6 @@
                 return;
             }
 
-            // POST request to create a new player if necessary
             fetch('http://localhost:3000/api/players', {
                 method: 'POST',
                 headers: {
@@ -99,7 +109,6 @@
             })
             .then(data => {
                 console.log("Player created:", data);
-                // Now create a new game
                 createNewGame(data.id);
             })
             .catch(error => {
@@ -125,20 +134,17 @@
                 console.log("New game created:", gameData);
                 document.getElementById('gameSelection').style.display = 'block';
                 document.getElementById('gameResult').style.display = 'none';
-                // Store the gameId for future use
                 window.gameId = gameData.gameId; 
             })
             .catch(error => {
                 console.error("Error creating game:", error);
-                alert("There was an error creating a new game. Please try again later.");
             });
         }
 
-        // Handle the player's move
         document.querySelectorAll('.moveBtn').forEach(button => {
             button.addEventListener('click', function() {
-                const playerMove = this.id.replace('Btn', '').toLowerCase();  // Remove 'Btn' from the id
-                const gameId = window.gameId; // Use the stored gameId
+                const playerMove = this.id.replace('Btn', '').toLowerCase();
+                const gameId = window.gameId;
                 playGame(gameId, playerMove);
             });
         });
@@ -202,16 +208,14 @@
             document.getElementById('lobbyMessage').innerText = "Tournaments are coming soon!";
         }
 
-        // Play against AI
         document.getElementById('playAgainstAIBtn').addEventListener('click', function() {
             document.getElementById('aiSelection').style.display = 'block';
             document.getElementById('aiResult').style.display = 'none';
         });
 
-        // AI plays Rock, Paper, Scissors
         document.querySelectorAll('.aiMoveBtn').forEach(button => {
             button.addEventListener('click', function() {
-                const playerMove = this.id.replace('ai', '').replace('Btn', '').toLowerCase(); // Remove 'ai' and 'Btn' from the id
+                const playerMove = this.id.replace('ai', '').replace('Btn', '').toLowerCase();
                 const aiMove = getAIChoice();
                 const result = determineWinner(playerMove, aiMove);
                 updateScore(result);
@@ -253,6 +257,8 @@
                 document.getElementById('aiWins').innerText = aiWins;
             }
         }
-    </script>
+    }
+</script>
+
 </body>
 </html>

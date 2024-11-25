@@ -146,3 +146,35 @@ th {
 #gamesList {
     margin-top: 10px;
 }
+
+
+/* Header für Logout  */
+header {
+    position: fixed; 
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 10px;
+    background-color: #333;
+    color: white;
+    display: flex;
+    justify-content: flex-end; 
+    z-index: 1000; 
+}
+.user-info {
+    display: flex;
+    align-items: center;
+}
+
+#logout-button {
+    margin-left: 15px;
+    padding: 5px 10px;
+    background-color: red;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+#logout-button:hover {
+    background-color: darkred;
+}

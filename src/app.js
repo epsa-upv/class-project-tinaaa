@@ -51,7 +51,7 @@ app.get('/api/games/open', (req, res) => {
     });
 });
 
-// NCreating new game
+// Creating new game
 app.post('/api/games', (req, res) => {
     const { playerId } = req.body; // playerId wird als player1_id gesetzt
     const sql = 'INSERT INTO games (player1_id, player2_id, status) VALUES (?, NULL, "open")';

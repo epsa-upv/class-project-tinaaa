@@ -8,22 +8,22 @@
 
 /* Body styles */
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f0f0f0;
-    color: #333;
+    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+    color: #ffffff;
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
     margin: 0;
+    font-family: Arial, sans-serif;
 }
 
 /* Container for the login section */
 .container {
-    background-color: #fff;
+    background: rgba(255, 255, 255, 0.1);
     padding: 20px;
     border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     max-width: 600px;
     width: 100%;
     text-align: center;
@@ -31,19 +31,22 @@ body {
 
 /* Welcome message */
 h1 {
-    color: #0078D7;
+    font-size: 2.5rem;
     margin-bottom: 20px;
+    background: linear-gradient(90deg, #ff6b6b, #feca57);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
 .description {
     font-size: 16px;
-    color: #777;
+    color: #bbb;
     margin-bottom: 20px;
 }
 
 /* Button styling */
 button {
-    background-color: #0078D7;
+    background: linear-gradient(90deg, #1d3557, #457b9d);
     color: white;
     padding: 12px 20px;
     border: none;
@@ -52,10 +55,12 @@ button {
     width: 80%;
     font-size: 16px;
     margin: 10px 0;
+    transition: all 0.3s ease;
 }
 
 button:hover {
-    background-color: #005bb5;
+    background: linear-gradient(90deg, #457b9d, #a8dadc);
+    transform: scale(1.1);
 }
 
 /* Input fields styling */
@@ -64,21 +69,24 @@ input[type="text"], input[type="password"] {
     width: 80%;
     margin: 10px 0;
     border-radius: 5px;
-    border: 1px solid #ddd;
+    border: none;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    text-align: center;
     font-size: 14px;
+    outline: none;
 }
 
-input[type="text"]:focus, input[type="password"]:focus {
-    border-color: #0078D7;
-    outline: none;
+input::placeholder {
+    color: rgba(255, 255, 255, 0.7);
 }
 
 /* Form section */
 .login-box {
-    background-color: #f8f8f8;
+    background: rgba(255, 255, 255, 0.1);
     padding: 20px;
     border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
 /* Additional sections */
@@ -87,7 +95,7 @@ input[type="text"]:focus, input[type="password"]:focus {
 }
 
 .signup-link a {
-    color: #0078D7;
+    color: #feca57;
     text-decoration: none;
 }
 
@@ -106,14 +114,14 @@ input[type="text"]:focus, input[type="password"]:focus {
 
 .ai-section {
     padding: 15px;
-    background-color: #e6f4ff;
+    background: rgba(255, 255, 255, 0.1);
     border-radius: 8px;
-    border: 1px solid #0078D7;
+    border: 1px solid #48b1bf;
     margin-top: 40px;
 }
 
 h3 {
-    color: #0078D7;
+    color: #48b1bf;
 }
 
 /* Table styling */
@@ -121,46 +129,47 @@ table {
     width: 100%;
     margin-top: 20px;
     border-collapse: collapse;
+    background: rgba(255, 255, 255, 0.1);
 }
 
-table, th, td {
-    border: 1px solid #ddd;
-}
-
-th, td {
+table th, table td {
     padding: 10px;
     text-align: center;
+    color: white;
 }
 
-th {
-    background-color: #0078D7;
-    color: white;
+table th {
+    background: #457b9d;
+}
+
+table tr:nth-child(even) {
+    background: rgba(255, 255, 255, 0.05);
 }
 
 /* Additional error messages */
 #lobbyMessage {
     margin-top: 20px;
-    color: #e60000;
+    color: #e63946;
 }
 
 #gamesList {
     margin-top: 10px;
 }
 
-
-/* Header für Logout  */
+/* Header für Logout */
 header {
     position: fixed; 
     top: 0;
     left: 0;
     width: 100%;
     padding: 10px;
-    background-color: #333;
-    color: white;
+    background: rgba(255, 255, 255, 0.1);
+    border-bottom: 2px solid rgba(255, 255, 255, 0.2);
     display: flex;
     justify-content: flex-end; 
     z-index: 1000; 
 }
+
 .user-info {
     display: flex;
     align-items: center;
@@ -169,12 +178,12 @@ header {
 #logout-button {
     margin-left: 15px;
     padding: 5px 10px;
-    background-color: red;
-    color: white;
+    background: #ff6b6b;
     border: none;
+    border-radius: 5px;
+    color: white;
     cursor: pointer;
 }
 
 #logout-button:hover {
-    background-color: darkred;
-}
+   

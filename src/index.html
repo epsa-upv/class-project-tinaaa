@@ -35,9 +35,11 @@
             })
             .then(response => response.json())
             .then(data => {
-    if (data.message === 'Login successful') { // Überprüfe den message-Text
+                
+        if (data.message === 'Login successful') { // Überprüfe den message-Text
         localStorage.setItem('playerName', username);
-        window.location.href = 'lobby.html';
+        localStorage.setItem('role', data.role)
+            window.location.href = 'lobby.html';
     } else {
         alert('Login failed: ' + (data.error || 'Unknown error'));
     }

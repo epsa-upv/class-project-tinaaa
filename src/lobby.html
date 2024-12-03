@@ -181,8 +181,31 @@ if (playerName) {
         document.getElementById('viewTournamentsBtn').addEventListener('click', viewTournaments);
 
         function viewTournaments() {
-            document.getElementById('lobbyMessage').innerText = "Tournaments are coming soon!";
+            fetch('http://localhost:3000/api/tournaments')
+                .then(response => response.json())
+                .then(data => {
+                    const tournamentDetails = document.getElementById('tournamentDetails');
+                    tournamentDetails.style.display = 'block';
+                    tournamentDetails.innerHTML = '<h3>Tournaments:</h3>';
+
+                    if (Array.isArray(data) && data.length > 0) {
+                        const list = document.createElement('ul');
+                        data.forEach(tournament => {
+                            const listItem = document.createElement('li');
+                            listItem.textContent = `ID: ${tournament.tournamentID}, Name: ${tournament.name}, Status: ${tournament.status}`;
+                            list.appendChild(listItem);
+                        });
+                        tournamentDetails.appendChild(list);
+                    } else {
+                        tournamentDetails.innerHTML += '<p>No tournaments available.</p>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching tournaments:', error);
+                    document.getElementById('tournamentDetails').innerText = 'Error fetching tournaments.';
+                });
         }
+
 
         // Play against AI
         document.getElementById('playAgainstAIBtn').addEventListener('click', function() {

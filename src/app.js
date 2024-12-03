@@ -159,6 +159,26 @@ app.get('/api/tournaments', (req, res) => {
 });
 
 
+// Create a new tournament
+app.post('/api/tournaments', (req, res) => {
+    const { name, startDate, endDate } = req.body;
+
+    // Validating input
+    if (!name || !startDate || !endDate) {
+        return res.status(400).json({ error: 'All fields (name, startDate, endDate) are required.' });
+    }
+
+    const sql = 'INSERT INTO tournaments (name, status, startDate, endDate) VALUES (?, "active", ?, ?)';
+    db.query(sql, [name, startDate, endDate], (err, result) => {
+        if (err) {
+            console.error('Error creating tournament:', err);
+            return res.status(500).json({ error: 'Error creating tournament.' });
+        }
+        res.status(201).json({ message: 'Tournament created successfully', tournamentID: result.insertId });
+    });
+});
+
+
 
 
 // Start the server

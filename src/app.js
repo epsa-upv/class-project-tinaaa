@@ -144,12 +144,6 @@ function determineWinner(playerMove, aiMove) {
 }
 
 
-
-
-
-
-
-
 // Start the server
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);

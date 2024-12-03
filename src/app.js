@@ -144,6 +144,23 @@ function determineWinner(playerMove, aiMove) {
 }
 
 
+//Tournaments
+
+// Show all tournaments
+app.get('/api/tournaments', (req, res) => {
+    const sql = 'SELECT * FROM tournaments';
+    db.query(sql, (err, results) => {
+        if (err) {
+            console.error('Error fetching tournaments:', err);
+            return res.status(500).json({ error: 'Error fetching tournaments' });
+        }
+        res.json(results);
+    });
+});
+
+
+
+
 // Start the server
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);

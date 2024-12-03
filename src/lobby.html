@@ -70,20 +70,18 @@
 
     <script>
     const playerName = localStorage.getItem("playerName");
+if (playerName) {
+        document.getElementById('playerNameDisplay').innerText = playerName;
+    } else {
+        alert("Player name is missing.");
+        window.location.href = "index.html"; // Weiterleitung zur Login-Seite
+    }
 
-        if (playerName) {
-            document.getElementById('playerNameDisplay').innerText = playerName;
-        } else {
-            alert("Player name is missing.");
-            window.location.href = "index.html"; // Redirect to login page if no player name exists
-        }
-        
-        if (playerName) {
-            document.getElementById('playerNameDisplay').innerText = playerName;
-        } else {
-            alert("Player name is missing.");
-            window.location.href = "index.html"; // Redirect to index page if no player name exists
-        }
+    // Logout-Funktion
+    document.getElementById('logout-button').addEventListener('click', function() {
+        localStorage.removeItem('playerName'); // Lokale Speicherung löschen
+        window.location.href = 'index.html'; // Weiterleitung zur Login-Seite
+    });
 
         document.getElementById('startNewGameBtn').addEventListener('click', startNewGame);
 

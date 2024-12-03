@@ -85,6 +85,8 @@
 
     <script>
     const playerName = localStorage.getItem("playerName");
+    const role = localStorage.getItem('role');
+    console.log(role)
 if (playerName) {
         document.getElementById('playerNameDisplay').innerText = playerName;
     } else {

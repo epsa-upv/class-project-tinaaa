@@ -66,6 +66,21 @@
 
         <p id="lobbyMessage"></p>
         <ul id="gamesList"></ul>
+
+        <div id="createTournamentForm" style="display: none;">
+            <h3>Create a New Tournament</h3>
+            <label for="tournamentName">Tournament Name:</label>
+            <input type="text" id="tournamentName" required>
+            <br>
+            <label for="startDate">Start Date:</label>
+            <input type="date" id="startDate" required>
+            <br>
+            <label for="endDate">End Date:</label>
+            <input type="date" id="endDate" required>
+            <br>
+            <button id="submitTournamentBtn">Create Tournament</button>
+        </div>
+        
     </div>
 
     <script>
@@ -205,6 +220,43 @@ if (playerName) {
                     document.getElementById('tournamentDetails').innerText = 'Error fetching tournaments.';
                 });
         }
+
+        // Show the tournament creation form
+        document.getElementById('createTournamentBtn').addEventListener('click', () => {
+            document.getElementById('createTournamentForm').style.display = 'block';
+        });
+
+        // Handle tournament creation
+        document.getElementById('submitTournamentBtn').addEventListener('click', () => {
+            const name = document.getElementById('tournamentName').value;
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+
+            if (!name || !startDate || !endDate) {
+                alert('All fields are required.');
+                return;
+            }
+
+            fetch('http://localhost:3000/api/tournaments', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, startDate, endDate }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert(data.error);
+                } else {
+                    alert(`Tournament "${name}" created successfully!`);
+                    document.getElementById('createTournamentForm').style.display = 'none';
+                }
+            })
+            .catch(error => {
+                console.error('Error creating tournament:', error);
+                alert('Error creating tournament.');
+            });
+        });
+
 
 
         // Play against AI

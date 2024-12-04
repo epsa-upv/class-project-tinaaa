@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Open Games</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+    <button onclick="window.location.href='lobby.html'">Back to Lobby</button>
+</header>
+<div class="container">
+    <h1>Open Games</h1>
+    <ul id="gamesList"></ul>
+</div>
+<script>
+    // Fetch and display open games
+    fetch('http://localhost:3000/api/games/open')
+        .then(response => response.json())
+        .then(data => {
+            const gamesList = document.getElementById('gamesList');
+            if (Array.isArray(data) && data.length > 0) {
+                data.forEach(game => {
+                    const li = document.createElement('li');
+                    li.textContent = `Game ID: ${game.id} - Player: ${game.playerId}`;
+                    gamesList.appendChild(li);
+                });
+            } else {
+                gamesList.innerHTML = "<li>No open games found.</li>";
+            }
+        });
+</script>
+</body>
+</html>

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Tournament</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+    <button onclick="window.location.href='lobby.html'">Back to Lobby</button>
+</header>
+<div class="container">
+    <h1>Create Tournament</h1>
+    <form id="tournamentForm">
+        <label for="tournamentName">Tournament Name:</label>
+        <input type="text" id="tournamentName" required>
+        <br>
+        <label for="startDate">Start Date:</label>
+        <input type="date" id="startDate" required>
+        <br>
+        <label for="endDate">End Date:</label>
+        <input type="date" id="endDate" required>
+        <br>
+        <button type="submit">Create Tournament</button>
+    </form>
+</div>
+<script>
+    // Submit tournament creation
+    document.getElementById('tournamentForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const name = document.getElementById('tournamentName').value;
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
+
+        fetch('http://localhost:3000/api/tournaments', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, startDate, endDate }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(`Tournament "${name}" created successfully!`);
+        });
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Start New Game</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+    <button onclick="window.location.href='lobby.html'">Back to Lobby</button>
+</header>
+<div class="container">
+    <h1>Start a New Game</h1>
+    <div id="gameSelection">
+        <h3 id="currentPlayer">Player 1, choose your move:</h3>
+        <button class="moveBtn" id="rockBtn">Rock</button>
+        <button class="moveBtn" id="paperBtn">Paper</button>
+        <button class="moveBtn" id="scissorsBtn">Scissors</button>
+    </div>
+    <div id="gameResult" style="display: none;">
+        <h3>Result:</h3>
+        <p id="resultText"></p>
+    </div>
+    <div id="finalScoreboard" style="display: none;">
+        <h2>Game Over!</h2>
+        <h3>Final Scoreboard</h3>
+        <table>
+            <tr>
+                <th>Player</th>
+                <th>Score</th>
+            </tr>
+            <tr>
+                <td>Player 1</td>
+                <td id="finalPlayer1Score">0</td>
+            </tr>
+            <tr>
+                <td>Player 2</td>
+                <td id="finalPlayer2Score">0</td>
+            </tr>
+        </table>
+        <h3 id="finalResult"></h3>
+        <button onclick="resetGame()">Play Again</button>
+    </div>
+</div>
+<div class="scoreboard">
+    <h3>Current Score</h3>
+    <table>
+        <tr>
+            <th>Player</th>
+            <th>Score</th>
+        </tr>
+        <tr>
+            <td>Player 1</td>
+            <td id="player1Score">0</td>
+        </tr>
+        <tr>
+            <td>Player 2</td>
+            <td id="player2Score">0</td>
+        </tr>
+    </table>
+</div>
+
+<script>
+    let player1Move = null;
+    let player2Move = null;
+    let player1Score = 0;
+    let player2Score = 0;
+    let currentPlayer = 1;
+    let roundCount = 0;
+    const totalRounds = 5; // Anzahl der Runden
+
+    document.querySelectorAll('.moveBtn').forEach(button => {
+        button.addEventListener('click', (event) => {
+            const move = event.target.id.replace('Btn', '');
+            if (currentPlayer === 1) {
+                player1Move = move;
+                currentPlayer = 2;
+                document.getElementById('currentPlayer').textContent = "Player 2, choose your move:";
+            } else {
+                player2Move = move;
+                determineWinner();
+                roundCount++;
+                if (roundCount >= totalRounds) {
+                    displayFinalScoreboard();
+                } else {
+                    currentPlayer = 1;
+                    document.getElementById('currentPlayer').textContent = "Player 1, choose your move:";
+                }
+            }
+        });
+    });
+
+    function determineWinner() {
+        const resultText = document.getElementById('resultText');
+        document.getElementById('gameResult').style.display = 'block';
+
+        if (player1Move === player2Move) {
+            resultText.textContent = "It's a tie!";
+        } else if (
+            (player1Move === 'rock' && player2Move === 'scissors') ||
+            (player1Move === 'scissors' && player2Move === 'paper') ||
+            (player1Move === 'paper' && player2Move === 'rock')
+        ) {
+            resultText.textContent = "Player 1 wins this round!";
+            player1Score++;
+        } else {
+            resultText.textContent = "Player 2 wins this round!";
+            player2Score++;
+        }
+
+        document.getElementById('player1Score').textContent = player1Score;
+        document.getElementById('player2Score').textContent = player2Score;
+
+        player1Move = null;
+        player2Move = null;
+    }
+
+    function displayFinalScoreboard() {
+        document.getElementById('gameSelection').style.display = 'none';
+        document.getElementById('gameResult').style.display = 'none';
+        document.getElementById('finalScoreboard').style.display = 'block';
+
+        document.getElementById('finalPlayer1Score').textContent = player1Score;
+        document.getElementById('finalPlayer2Score').textContent = player2Score;
+
+        if (player1Score > player2Score) {
+            document.getElementById('finalResult').textContent = "Player 1 is the winner!";
+        } else if (player2Score > player1Score) {
+            document.getElementById('finalResult').textContent = "Player 2 is the winner!";
+        } else {
+            document.getElementById('finalResult').textContent = "It's a tie!";
+        }
+    }
+
+    function resetGame() {
+        player1Score = 0;
+        player2Score = 0;
+        roundCount = 0;
+        currentPlayer = 1;
+
+        document.getElementById('player1Score').textContent = player1Score;
+        document.getElementById('player2Score').textContent = player2Score;
+
+        document.getElementById('gameSelection').style.display = 'block';
+        document.getElementById('gameResult').style.display = 'none';
+        document.getElementById('finalScoreboard').style.display = 'none';
+
+        document.getElementById('currentPlayer').textContent = "Player 1, choose your move:";
+    }
+</script>
+</body>
+</html>

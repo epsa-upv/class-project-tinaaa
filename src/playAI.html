@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Play Against AI</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+    <button onclick="window.location.href='lobby.html'">Back to Lobby</button>
+</header>
+<div class="container">
+    <h1>Play Against AI</h1>
+    <div id="gameSelection">
+        <h3 id="currentPlayer">You, choose your move:</h3>
+        <button class="moveBtn" id="rockBtn">Rock</button>
+        <button class="moveBtn" id="paperBtn">Paper</button>
+        <button class="moveBtn" id="scissorsBtn">Scissors</button>
+    </div>
+    <div id="gameResult" style="display: none;">
+        <h3>Result:</h3>
+        <p id="resultText"></p>
+    </div>
+    <div id="finalScoreboard" style="display: none;">
+        <h2>Game Over!</h2>
+        <h3>Final Scoreboard</h3>
+        <table>
+            <tr>
+                <th>Player</th>
+                <th>Score</th>
+            </tr>
+            <tr>
+                <td>You</td>
+                <td id="finalPlayer1Score">0</td>
+            </tr>
+            <tr>
+                <td>AI</td>
+                <td id="finalPlayer2Score">0</td>
+            </tr>
+        </table>
+        <h3 id="finalResult"></h3>
+        <button onclick="resetGame()">Play Again</button>
+    </div>
+</div>
+<div class="scoreboard">
+    <h3>Current Score</h3>
+    <table>
+        <tr>
+            <th>Player</th>
+            <th>Score</th>
+        </tr>
+        <tr>
+            <td>You</td>
+            <td id="player1Score">0</td>
+        </tr>
+        <tr>
+            <td>AI</td>
+            <td id="player2Score">0</td>
+        </tr>
+    </table>
+</div>
+
+<script>
+    let playerMove = null;
+    let aiMove = null;
+    let playerScore = 0;
+    let aiScore = 0;
+    const totalRounds = 5;
+    let roundCount = 0;
+
+    document.querySelectorAll('.moveBtn').forEach(button => {
+        button.addEventListener('click', (event) => {
+            const move = event.target.id.replace('Btn', '');
+            playerMove = move;
+            aiMove = getAIMove();
+            determineWinner();
+            roundCount++;
+            if (roundCount >= totalRounds) {
+                displayFinalScoreboard();
+            }
+        });
+    });
+
+    function getAIMove() {
+        const moves = ['rock', 'paper', 'scissors'];
+        return moves[Math.floor(Math.random() * moves.length)];
+    }
+
+    function determineWinner() {
+        const resultText = document.getElementById('resultText');
+        document.getElementById('gameResult').style.display = 'block';
+
+        if (playerMove === aiMove) {
+            resultText.textContent = "It's a tie!";
+        } else if (
+            (playerMove === 'rock' && aiMove === 'scissors') ||
+            (playerMove === 'scissors' && aiMove === 'paper') ||
+            (playerMove === 'paper' && aiMove === 'rock')
+        ) {
+            resultText.textContent = "You win this round!";
+            playerScore++;
+        } else {
+            resultText.textContent = "AI wins this round!";
+            aiScore++;
+        }
+
+        document.getElementById('player1Score').textContent = playerScore;
+        document.getElementById('player2Score').textContent = aiScore;
+    }
+
+    function displayFinalScoreboard() {
+        document.getElementById('gameSelection').style.display = 'none';
+        document.getElementById('gameResult').style.display = 'none';
+        document.getElementById('finalScoreboard').style.display = 'block';
+
+        document.getElementById('finalPlayer1Score').textContent = playerScore;
+        document.getElementById('finalPlayer2Score').textContent = aiScore;
+
+        if (playerScore > aiScore) {
+            document.getElementById('finalResult').textContent = "You are the winner!";
+        } else if (aiScore > playerScore) {
+            document.getElementById('finalResult').textContent = "AI is the winner!";
+        } else {
+            document.getElementById('finalResult').textContent = "It's a tie!";
+        }
+    }
+
+    function resetGame() {
+        playerScore = 0;
+        aiScore = 0;
+        roundCount = 0;
+
+        document.getElementById('player1Score').textContent = playerScore;
+        document.getElementById('player2Score').textContent = aiScore;
+
+        document.getElementById('gameSelection').style.display = 'block';
+        document.getElementById('gameResult').style.display = 'none';
+        document.getElementById('finalScoreboard').style.display = 'none';
+    }
+</script>
+</body>
+</html>

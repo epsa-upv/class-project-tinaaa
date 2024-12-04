@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Tournaments</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+    <button onclick="window.location.href='lobby.html'">Back to Lobby</button>
+</header>
+<div class="container">
+    <h1>Tournaments</h1>
+    <div id="tournamentDetails"></div>
+</div>
+<script>
+    // Fetch and display tournaments
+    fetch('http://localhost:3000/api/tournaments')
+        .then(response => response.json())
+        .then(data => {
+            const tournamentDetails = document.getElementById('tournamentDetails');
+            if (Array.isArray(data) && data.length > 0) {
+                const list = document.createElement('ul');
+                data.forEach(tournament => {
+                    const li = document.createElement('li');
+                    li.textContent = `ID: ${tournament.tournamentID}, Name: ${tournament.name}`;
+                    list.appendChild(li);
+                });
+                tournamentDetails.appendChild(list);
+            } else {
+                tournamentDetails.innerHTML = "<p>No tournaments available.</p>";
+            }
+        });
+</script>
+</body>
+</html>

@@ -13,305 +13,34 @@
         <button id="logout-button">Logout</button>
     </div>
 </header>
-<body>
-    <div class="container">
-        <h1>Welcome, <span id="playerNameDisplay"></span>!</h1>
-        <p>Select an option:</p>
-        <button id="startNewGameBtn">Start New Game</button>
-        <button id="viewOpenGamesBtn">View Open Games</button>
-        <button id="viewTournamentsBtn">View Tournaments</button>
-        <button id="createTournamentBtn">Create New Tournament</button>
-        <button id="playAgainstAIBtn">Play Against AI</button>
-
-        <div id="gameSelection" style="display: none;">
-            <h3>Choose your move:</h3>
-            <button class="moveBtn" id="rockBtn">Rock</button>
-            <button class="moveBtn" id="paperBtn">Paper</button>
-            <button class="moveBtn" id="scissorsBtn">Scissors</button>
-        </div>
-
-        <div id="gameResult" style="display: none;">
-            <h3>Game Result:</h3>
-            <p id="resultText"></p>
-        </div>
-
-        <div id="tournamentDetails" style="display: none;">
-            <h3>Tournaments and Rounds</h3>
-        </div>
-        
-
-        <div id="aiSelection" style="display: none;">
-            <h3>Choose your move against the AI:</h3>
-            <button class="aiMoveBtn" id="aiRockBtn">Rock</button>
-            <button class="aiMoveBtn" id="aiPaperBtn">Paper</button>
-            <button class="aiMoveBtn" id="aiScissorsBtn">Scissors</button>
-        </div>
-
-        <div id="aiResult" style="display: none;">
-            <h3>AI Game Result:</h3>
-            <p id="aiResultText"></p>
-        </div>
-
-        <h3>Scoreboard:</h3>
-        <table>
-            <tr>
-                <th>Your Wins</th>
-                <th>AI Wins</th>
-            </tr>
-            <tr>
-                <td id="playerWins">0</td>
-                <td id="aiWins">0</td>
-            </tr>
-        </table>
-
-        <p id="lobbyMessage"></p>
-        <ul id="gamesList"></ul>
-
-        <div id="createTournamentForm" style="display: none;">
-            <h3>Create a New Tournament</h3>
-            <label for="tournamentName">Tournament Name:</label>
-            <input type="text" id="tournamentName" required>
-            <br>
-            <label for="startDate">Start Date:</label>
-            <input type="date" id="startDate" required>
-            <br>
-            <label for="endDate">End Date:</label>
-            <input type="date" id="endDate" required>
-            <br>
-            <button id="submitTournamentBtn">Create Tournament</button>
-        </div>
-        
-    </div>
-
-    <script>
+<div class="container">
+    <h1>Welcome, <span id="playerNameDisplay"></span>!</h1>
+    <p>Select an option:</p>
+    <button onclick="navigateTo('startGame.html')">Start New Game</button>
+    <button onclick="navigateTo('viewGames.html')">View Open Games</button>
+    <button onclick="navigateTo('viewTournaments.html')">View Tournaments</button>
+    <button onclick="navigateTo('createTournament.html')">Create New Tournament</button>
+    <button onclick="navigateTo('playAI.html')">Play Against AI</button>
+</div>
+<script>
     const playerName = localStorage.getItem("playerName");
-    const role = localStorage.getItem('role');
-    console.log(role)
-if (playerName) {
+    if (playerName) {
         document.getElementById('playerNameDisplay').innerText = playerName;
     } else {
         alert("Player name is missing.");
-        window.location.href = "index.html"; // Weiterleitung zur Login-Seite
+        window.location.href = "index.html";
     }
 
-    // Logout-Funktion
-    document.getElementById('logout-button').addEventListener('click', function() {
-        localStorage.removeItem('playerName'); // Lokale Speicherung löschen
-        window.location.href = 'index.html'; // Weiterleitung zur Login-Seite
+    // Navigation function
+    function navigateTo(page) {
+        window.location.href = page;
+    }
+
+    // Logout function
+    document.getElementById('logout-button').addEventListener('click', () => {
+        localStorage.removeItem('playerName');
+        window.location.href = 'index.html';
     });
-
-        document.getElementById('startNewGameBtn').addEventListener('click', startNewGame);
-
-        function startNewGame() {
-            if (!playerName) {
-                alert("Please enter your name first.");
-                return;
-            }
-
-            fetch('http://localhost:3000/api/players', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ playerName: playerName }),
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log("Player created:", data);
-                // Now create a new game
-                createNewGame(data.id);
-            })
-            .catch(error => console.error("Error creating player:", error));
-        }
-
-        function createNewGame(playerId) {
-            fetch('http://localhost:3000/api/games', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ playerId: playerId }),
-            })
-            .then(response => response.json())
-            .then(gameData => {
-                document.getElementById('gameSelection').style.display = 'block';
-                document.getElementById('gameResult').style.display = 'none';
-                // Store the gameId for future use
-                window.gameId = gameData.gameId; 
-            })
-            .catch(error => {
-                console.error("Error creating game:", error);
-                alert("There was an error creating a new game. Please try again later.");
-            });
-        }
-
-        // Handle the player's move
-        document.querySelectorAll('.moveBtn').forEach(button => {
-            button.addEventListener('click', function() {
-                const playerMove = this.id.replace('Btn', '').toLowerCase();  // Remove 'Btn' from the id
-                const gameId = window.gameId; // Use the stored gameId
-                playGame(gameId, playerMove);
-            });
-        });
-
-        function playGame(gameId, playerMove) {
-            fetch(`http://localhost:3000/api/games/${gameId}/play`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ playerMove: playerMove }),
-            })
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('gameSelection').style.display = 'none';
-                document.getElementById('gameResult').style.display = 'block';
-                document.getElementById('resultText').innerText = `You chose ${data.playerMove}. AI chose ${data.computerMove}. Result: ${data.result}`;
-            })
-            .catch(error => {
-                console.error("Error playing game:", error);
-                alert("There was an error during the game. Please try again.");
-            });
-        }
-
-        document.getElementById('viewOpenGamesBtn').addEventListener('click', viewOpenGames);
-
-        function viewOpenGames() {
-            fetch('http://localhost:3000/api/games/open')
-                .then(response => response.json())
-                .then(data => {
-                    if (data.error) {
-                        document.getElementById('lobbyMessage').innerText = data.error;
-                    } else if (Array.isArray(data) && data.length > 0) {
-                        console.log("Open games:", data);
-                        const gamesList = document.getElementById('gamesList');
-                        gamesList.innerHTML = '';
-                        data.forEach(game => {
-                            const li = document.createElement('li');
-                            li.textContent = `Game ID: ${game.id} - Player: ${game.playerId}`;
-                            gamesList.appendChild(li);
-                        });
-                    } else {
-                        document.getElementById('lobbyMessage').innerText = "No open games found.";
-                    }
-                })
-                .catch(error => {
-                    console.error("Error fetching open games:", error);
-                    document.getElementById('lobbyMessage').innerText = "Error fetching open games.";
-                });
-        }
-
-        document.getElementById('viewTournamentsBtn').addEventListener('click', viewTournaments);
-
-        function viewTournaments() {
-            fetch('http://localhost:3000/api/tournaments')
-                .then(response => response.json())
-                .then(data => {
-                    const tournamentDetails = document.getElementById('tournamentDetails');
-                    tournamentDetails.style.display = 'block';
-                    tournamentDetails.innerHTML = '<h3>Tournaments:</h3>';
-
-                    if (Array.isArray(data) && data.length > 0) {
-                        const list = document.createElement('ul');
-                        data.forEach(tournament => {
-                            const listItem = document.createElement('li');
-                            listItem.textContent = `ID: ${tournament.tournamentID}, Name: ${tournament.name}, Status: ${tournament.status}`;
-                            list.appendChild(listItem);
-                        });
-                        tournamentDetails.appendChild(list);
-                    } else {
-                        tournamentDetails.innerHTML += '<p>No tournaments available.</p>';
-                    }
-                })
-                .catch(error => {
-                    console.error('Error fetching tournaments:', error);
-                    document.getElementById('tournamentDetails').innerText = 'Error fetching tournaments.';
-                });
-        }
-
-        // Show the tournament creation form
-        document.getElementById('createTournamentBtn').addEventListener('click', () => {
-            document.getElementById('createTournamentForm').style.display = 'block';
-        });
-
-        // Handle tournament creation
-        document.getElementById('submitTournamentBtn').addEventListener('click', () => {
-            const name = document.getElementById('tournamentName').value;
-            const startDate = document.getElementById('startDate').value;
-            const endDate = document.getElementById('endDate').value;
-
-            if (!name || !startDate || !endDate) {
-                alert('All fields are required.');
-                return;
-            }
-
-            fetch('http://localhost:3000/api/tournaments', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name, startDate, endDate }),
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.error) {
-                    alert(data.error);
-                } else {
-                    alert(`Tournament "${name}" created successfully!`);
-                    document.getElementById('createTournamentForm').style.display = 'none';
-                }
-            })
-            .catch(error => {
-                console.error('Error creating tournament:', error);
-                alert('Error creating tournament.');
-            });
-        });
-
-
-
-        // Play against AI
-        document.getElementById('playAgainstAIBtn').addEventListener('click', function() {
-            document.getElementById('aiSelection').style.display = 'block';
-            document.getElementById('aiResult').style.display = 'none';
-        });
-
-        // AI plays Rock, Paper, Scissors
-        document.querySelectorAll('.aiMoveBtn').forEach(button => {
-            button.addEventListener('click', function() {
-                const playerMove = this.id.replace('ai', '').replace('Btn', '').toLowerCase(); // Remove 'ai' and 'Btn' from the id
-                const aiMove = getAIChoice();
-                const result = determineWinner(playerMove, aiMove);
-                updateScore(result);
-                document.getElementById('aiSelection').style.display = 'none';
-                document.getElementById('aiResult').style.display = 'block';
-                document.getElementById('aiResultText').innerText = `You chose ${playerMove}. The AI chose ${aiMove}. Result: ${result}`;
-            });
-        });
-
-        function getAIChoice() {
-            const choices = ['rock', 'paper', 'scissors'];
-            const randomIndex = Math.floor(Math.random() * choices.length);
-            return choices[randomIndex];
-        }
-
-        function determineWinner(playerMove, aiMove) {
-            if (playerMove === aiMove) {
-                return 'Draw';
-            }
-            if (
-                (playerMove === 'rock' && aiMove === 'scissors') ||
-                (playerMove === 'scissors' && aiMove === 'paper') ||
-                (playerMove === 'paper' && aiMove === 'rock')
-            ) {
-                return 'You win';
-            }
-            return 'AI wins';
-        }
-
-        let playerWins = 0;
-        let aiWins = 0;
-
-        function updateScore(result) {
-            if (result === 'You win') {
-                playerWins++;
-                document.getElementById('playerWins').innerText = playerWins;
-            } else if (result === 'AI wins') {
-                aiWins++;
-                document.getElementById('aiWins').innerText = aiWins;
-            }
-        }
-    </script>
+</script>
 </body>
 </html>

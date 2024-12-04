@@ -72,24 +72,28 @@
 
     document.querySelectorAll('.moveBtn').forEach(button => {
         button.addEventListener('click', (event) => {
-            const move = event.target.id.replace('Btn', '');
-            if (currentPlayer === 1) {
-                player1Move = move;
-                currentPlayer = 2;
-                document.getElementById('currentPlayer').textContent = "Player 2, choose your move:";
-            } else {
-                player2Move = move;
-                determineWinner();
-                roundCount++;
-                if (roundCount >= totalRounds) {
-                    displayFinalScoreboard();
-                } else {
-                    currentPlayer = 1;
-                    document.getElementById('currentPlayer').textContent = "Player 1, choose your move:";
-                }
-            }
+            const move = event.target.id.replace('Btn', ''); // Beispiel: "rockBtn" => "rock"
+            const player1Id = 1; // Beispiel-ID für Player1 (kann dynamisch gesetzt werden)
+
+            // Sende den Zug von Player1 an das Backend
+            fetch('http://localhost:3000/api/games/start', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ player1Id, move })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data.message);
+                    alert("Spiel gestartet! Player1's Zug wurde gespeichert.");
+                    document.getElementById('currentPlayer').textContent = "Waiting for Player2 to make a move...";
+                })
+                .catch(err => {
+                    console.error("Fehler beim Starten des Spiels:", err);
+                    alert("Fehler beim Starten des Spiels.");
+                });
         });
     });
+
 
     function determineWinner() {
         const resultText = document.getElementById('resultText');

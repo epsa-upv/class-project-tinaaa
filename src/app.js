@@ -36,19 +36,31 @@ app.get('/api/games/open', (req, res) => {
     });
 });
 
-// Creating new game
-app.post('/api/games', (req, res) => {
-    const { playerId } = req.body; // playerId is set as player1_id
-    const sql = 'INSERT INTO games (player1_id, player2_id, status) VALUES (?, NULL, "open")';
-    db.query(sql, [playerId], (err, result) => {
+app.post('/api/games/start', (req, res) => {
+    const { player1Id, move } = req.body;
+
+    if (!player1Id || !move) {
+        return res.status(400).json({ error: "Player1 ID und Move sind erforderlich!" });
+    }
+
+    const sql = `
+        INSERT INTO games (player1_id, player1_move, player2_id, player2_move, status) 
+        VALUES (?, ?, NULL, NULL, "player1_turn")
+    `;
+
+    db.query(sql, [player1Id, move], (err, result) => {
         if (err) {
-            console.error("Error when creating a new game:", err);
-            res.status(500).send("Error when creating a new game.");
-            return;
+            console.error("Fehler beim Speichern des Spiels:", err);
+            return res.status(500).json({ error: "Fehler beim Speichern des Spiels." });
         }
-        res.status(201).json({ gameId: result.insertId, player1_id: playerId, player2_id: null, status: "open" });
+
+        res.status(201).json({
+            message: "Spiel wurde gestartet und Player1's Zug gespeichert.",
+            gameId: result.insertId,
+        });
     });
 });
+
 
 // Login route (distinguishing between Admin and Player)
 app.post('/api/login', (req, res) => {

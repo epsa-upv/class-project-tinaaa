@@ -23,13 +23,51 @@
             if (Array.isArray(data) && data.length > 0) {
                 data.forEach(game => {
                     const li = document.createElement('li');
-                    li.textContent = `Game ID: ${game.id} - Player: ${game.playerId}`;
+                    li.textContent = `Game ID: ${game.id} - Player 1: ${game.player1_id}`;
+
+                    // Create a button to join the game as player2
+                    const joinButton = document.createElement('button');
+                    joinButton.textContent = 'Join Game';
+                    joinButton.onclick = () => joinGame(game.id); // Call joinGame function with the game ID
+
+                    li.appendChild(joinButton);
                     gamesList.appendChild(li);
                 });
             } else {
                 gamesList.innerHTML = "<li>No open games found.</li>";
             }
         });
+
+    // Function to join a game
+    function joinGame(gameId) {
+        const player2Id = prompt("Enter your player ID to join this game:");
+
+        // Check if player2Id is provided
+        if (!player2Id) {
+            alert("Player ID is required.");
+            return;
+        }
+
+        // Make an API call to join the game
+        fetch('http://localhost:3000/api/games/join', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ gameId, player2Id })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.message) {
+                alert(data.message);
+                window.location.href = "lobby.html"; // Redirect to the lobby after joining
+            } else {
+                alert(data.error);
+            }
+        })
+        .catch(err => {
+            console.error('Error joining the game:', err);
+            alert("Error joining the game.");
+        });
+    }
 </script>
 </body>
 </html>

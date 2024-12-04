@@ -36,6 +36,7 @@ app.get('/api/games/open', (req, res) => {
     });
 });
 
+//start game
 app.post('/api/games/start', (req, res) => {
     const { player1Id, move } = req.body;
 
@@ -60,6 +61,37 @@ app.post('/api/games/start', (req, res) => {
         });
     });
 });
+
+
+// Join an open game as player2
+app.post('/api/games/join', (req, res) => {
+    const { gameId, player2Id } = req.body;
+
+    // Überprüfe, ob die erforderlichen Parameter übergeben wurden
+    if (!gameId || !player2Id) {
+        return res.status(400).json({ error: "gameId und player2Id sind erforderlich!" });
+    }
+
+    // SQL-Query, um das Spiel zu aktualisieren und player2_id zu setzen
+    const updateGameSql = 'UPDATE games SET player2_id = ?, status = "in_progress" WHERE id = ? AND player2_id IS NULL';
+
+    db.query(updateGameSql, [player2Id, gameId], (err, result) => {
+        if (err) {
+            console.error('Fehler beim Beitreten des Spiels:', err);
+            return res.status(500).json({ error: 'Fehler beim Beitreten des Spiels' });
+        }
+
+        // Wenn keine Zeilen aktualisiert wurden, bedeutet das, dass das Spiel entweder
+        // nicht existiert oder bereits einen Player2 hat
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ error: 'Spiel nicht gefunden oder bereits besetzt.' });
+        }
+
+        // Erfolgsmeldung, wenn das Spiel erfolgreich beigetreten wurde
+        res.status(200).json({ message: 'Spiel beigetreten und als Player2 gespeichert.' });
+    });
+});
+
 
 
 // Login route (distinguishing between Admin and Player)

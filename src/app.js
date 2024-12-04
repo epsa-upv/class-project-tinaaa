@@ -26,7 +26,7 @@ db.connect((err) => {
 
 // Show open games
 app.get('/api/games/open', (req, res) => {
-    const getOpenGamesSql = 'SELECT * FROM games WHERE status = "open"';
+    const getOpenGamesSql = 'SELECT * FROM games WHERE player2_id IS NULL';
     db.query(getOpenGamesSql, (err, results) => {
         if (err) {
             console.error('Error when showing open games:', err);

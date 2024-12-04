@@ -68,14 +68,14 @@
     let player2Score = 0;
     let currentPlayer = 1;
     let roundCount = 0;
-    const totalRounds = 5; // Anzahl der Runden
+    const totalRounds = 5; 
 
     document.querySelectorAll('.moveBtn').forEach(button => {
         button.addEventListener('click', (event) => {
-            const move = event.target.id.replace('Btn', ''); // Beispiel: "rockBtn" => "rock"
-            const player1Id = 1; // Beispiel-ID für Player1 (kann dynamisch gesetzt werden)
+            const move = event.target.id.replace('Btn', ''); 
+            const player1Id = 1; 
 
-            // Sende den Zug von Player1 an das Backend
+            // Send Move from player1 to backend
             fetch('http://localhost:3000/api/games/start', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },

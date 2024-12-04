@@ -190,3 +190,23 @@ header {
     cursor: pointer;
     transition: all 0.3s ease;
 }
+
+#back-to-lobby-button {
+    padding: 10px 20px;
+    font-size: 16px;
+    background: #ff6b6b;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: auto;
+    max-width: 200px;
+    margin: 10px auto;
+    display: block;
+}
+
+#back-to-lobby-button:hover {
+    background: #feca57;
+    transform: scale(1.05);
+}

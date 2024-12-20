@@ -114,37 +114,43 @@ app.post('/api/games/move', (req, res) => {
 
         const game = results[0];
         const player1Move = game.player1_move;
+        const player1Id = game.player1_id;
+        const player2Id = game.player2_id;
 
-        // Ermittle den Gewinner
-        let winner;
+        // Ermittle den Gewinner basierend auf den Spielzügen
+        let winnerId = null; // Standardwert, wenn es ein Unentschieden gibt
         if (player1Move === player2Move) {
-            winner = 'draw';
+            winnerId = null; // Unentschieden
         } else if (
             (player1Move === 'rock' && player2Move === 'scissors') ||
             (player1Move === 'scissors' && player2Move === 'paper') ||
             (player1Move === 'paper' && player2Move === 'rock')
         ) {
-            winner = 'player1';
+            winnerId = player1Id; // Spieler 1 gewinnt
         } else {
-            winner = 'player2';
+            winnerId = player2Id; // Spieler 2 gewinnt
         }
 
         // Update das Spiel mit dem Zug von Spieler 2 und dem Gewinner
         const updateGameSql = `
             UPDATE games
-            SET player2_move = ?, winner = ?, status = "finished"
+            SET player2_move = ?, winner_id = ?, status = "finished"
             WHERE id = ?
         `;
-        db.query(updateGameSql, [player2Move, winner, gameId], (updateErr) => {
+        db.query(updateGameSql, [player2Move, winnerId, gameId], (updateErr) => {
             if (updateErr) {
                 console.error('Fehler beim Aktualisieren des Spiels:', updateErr);
                 return res.status(500).json({ error: 'Fehler beim Aktualisieren des Spiels' });
             }
 
-            res.status(200).json({ message: 'Zug gespeichert und Gewinner ermittelt.', winner });
+            res.status(200).json({ 
+                message: 'Zug gespeichert und Gewinner ermittelt.', 
+                winner: winnerId 
+            });
         });
     });
 });
+
 
 
 

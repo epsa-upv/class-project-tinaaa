@@ -18,38 +18,38 @@
     </div>
 
     <script>
+        // Handle form submission
         document.getElementById('loginForm').addEventListener('submit', function(e) {
-        e.preventDefault(); // Verhindert das Standard-Formularverhalten
+            e.preventDefault(); // Prevent default form submission
 
-        const username = document.getElementById('username').value;
-        const password = document.getElementById('password').value;
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
 
-        // Sende die Login-Daten an den Server
-        fetch('http://localhost:3000/api/login', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ username, password })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.message === 'Login successful') {
-                // Speichere die Daten im localStorage
-                localStorage.setItem('playerID', data.id); // Speichere die Spieler-ID
-                localStorage.setItem('playerName', username); // Speichere den Spielernamen
-                localStorage.setItem('role', data.role); // Speichere die Rolle
-                window.location.href = 'lobby.html'; // Weiterleitung zur Lobby-Seite
-            } else {
-                alert('Login failed: ' + (data.error || 'Unknown error'));
-            }
-        })
-        .catch(error => {
-            console.error('Error during login:', error);
-            alert('An error occurred: ' + error.message);
+            // Send the login data to the backend (Express server)
+            fetch('http://localhost:3000/api/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ username, password })
+            })
+            .then(response => response.json())
+            .then(data => {
+                
+        if (data.message === 'Login successful') { // Überprüfe den message-Text
+        localStorage.setItem('playerName', username);
+        localStorage.setItem('role', data.role)
+            window.location.href = 'lobby.html';
+    } else {
+        alert('Login failed: ' + (data.error || 'Unknown error'));
+    }
+})
+
+            .catch(error => {
+                console.error('Error during login:', error);
+                alert('An error occurred: ' + error.message);
+            });
         });
-    });
-
     </script>
 </body>
 </html>

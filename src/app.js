@@ -160,7 +160,7 @@ app.post('/api/login', (req, res) => {
         }
 
         if (results.length === 0) {
-            return res.status(404).send('User not found');
+            return res.status(404).json({ error: 'User not found' });
         }
 
         const user = results[0];
@@ -169,15 +169,19 @@ app.post('/api/login', (req, res) => {
         bcrypt.compare(password, user.password, (err, isMatch) => {
             if (err) {
                 console.error('Error during password comparison:', err);
-                return res.status(500).send('Error during password comparison');
+                return res.status(500).json({ error: 'Error during password comparison' });
             }
 
             if (!isMatch) {
-                return res.status(401).send('Invalid password');
+                return res.status(401).json({ error: 'Invalid password' });
             }
 
-            // Return user role (Admin or Player)
-            res.status(200).json({ message: 'Login successful', role: user.role });
+            // Return user details including ID and role
+            res.status(200).json({
+                message: 'Login erfolgreich',
+                role: user.role,
+                id: user.id, // Spieler-ID zurückgeben
+            });
         });
     });
 });
@@ -275,6 +279,41 @@ app.post('/api/tournaments', (req, res) => {
         res.status(201).json({ message: 'Tournament created successfully', tournamentID: result.insertId });
     });
 });
+
+
+// API: Spieler einem Turnier beitreten
+app.post('/api/tournaments/join', (req, res) => {
+    const { tournamentID, id } = req.body; // Spieler-ID aus players-Tabelle ist 'id'
+
+    if (!tournamentID || !id) {
+        return res.status(400).json({ error: 'tournamentID und id sind erforderlich!' });
+    }
+
+    // Überprüfen, ob der Spieler bereits Teil des Turniers ist
+    const checkSql = 'SELECT * FROM tournament_players WHERE tournamentID = ? AND playerID = ?';
+    db.query(checkSql, [tournamentID, id], (err, results) => {
+        if (err) {
+            console.error('Fehler beim Überprüfen der Teilnahme:', err);
+            return res.status(500).json({ error: 'Datenbankfehler' });
+        }
+
+        if (results.length > 0) {
+            return res.status(400).json({ error: 'Player ist bereits Teil des Turniers!' });
+        }
+
+        // Spieler in das Turnier einfügen
+        const insertSql = 'INSERT INTO tournament_players (tournamentID, playerID) VALUES (?, ?)';
+        db.query(insertSql, [tournamentID, id], (err, result) => {
+            if (err) {
+                console.error('Fehler beim Hinzufügen zum Turnier:', err);
+                return res.status(500).json({ error: 'Datenbankfehler beim Hinzufügen' });
+            }
+
+            res.status(201).json({ message: 'Erfolgreich dem Turnier beigetreten!' });
+        });
+    });
+});
+
 
 
 

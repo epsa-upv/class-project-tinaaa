@@ -92,6 +92,60 @@ app.post('/api/games/join', (req, res) => {
     });
 });
 
+// API: Spieler 2 wählt seinen Zug
+app.post('/api/games/move', (req, res) => {
+    const { gameId, player2Move } = req.body;
+
+    if (!gameId || !player2Move) {
+        return res.status(400).json({ error: "Game ID und Player 2 Move sind erforderlich!" });
+    }
+
+    // Hole das Spiel aus der Datenbank
+    const getGameSql = 'SELECT * FROM games WHERE id = ?';
+    db.query(getGameSql, [gameId], (err, results) => {
+        if (err) {
+            console.error('Fehler beim Abrufen des Spiels:', err);
+            return res.status(500).json({ error: 'Fehler beim Abrufen des Spiels' });
+        }
+
+        if (results.length === 0) {
+            return res.status(404).json({ error: 'Spiel nicht gefunden.' });
+        }
+
+        const game = results[0];
+        const player1Move = game.player1_move;
+
+        // Ermittle den Gewinner
+        let winner;
+        if (player1Move === player2Move) {
+            winner = 'draw';
+        } else if (
+            (player1Move === 'rock' && player2Move === 'scissors') ||
+            (player1Move === 'scissors' && player2Move === 'paper') ||
+            (player1Move === 'paper' && player2Move === 'rock')
+        ) {
+            winner = 'player1';
+        } else {
+            winner = 'player2';
+        }
+
+        // Update das Spiel mit dem Zug von Spieler 2 und dem Gewinner
+        const updateGameSql = `
+            UPDATE games
+            SET player2_move = ?, winner = ?, status = "finished"
+            WHERE id = ?
+        `;
+        db.query(updateGameSql, [player2Move, winner, gameId], (updateErr) => {
+            if (updateErr) {
+                console.error('Fehler beim Aktualisieren des Spiels:', updateErr);
+                return res.status(500).json({ error: 'Fehler beim Aktualisieren des Spiels' });
+            }
+
+            res.status(200).json({ message: 'Zug gespeichert und Gewinner ermittelt.', winner });
+        });
+    });
+});
+
 
 
 // Login route (distinguishing between Admin and Player)
